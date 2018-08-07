@@ -1,0 +1,33 @@
+[
+	{
+		"name": "loanPolicies",
+		"path": "/loan-policy-storage/loan-policies",
+		"insertMethod": "post"
+	},
+	{
+		"name": "loanRules",
+		"path": "circulation/loan-rules",
+		"insertMethod": "put"
+	},
+	{
+		"name": "loanTypes",
+		"path": "/loan-types",
+		"insertMethod": "post"
+	},
+	{
+		"name": "materialTypes",
+		"path": "/material-types", 
+		"insertMethod": "post"
+	},
+	{
+		"name": "permissions",
+		"path": "/perms/permissions",
+		"insertMethod": "post",
+		"queryString": "?length=1000&query=(mutable==true)"
+	},
+	{
+		"name": "usergroups",
+		"path": "/groups",
+		"insertMethod": "post"
+	}
+]
