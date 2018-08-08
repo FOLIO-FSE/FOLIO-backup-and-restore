@@ -32,6 +32,8 @@ Given you have backed up your data according to the above guide. Run the followi
 ## Reference
 [FOLIO API reference](https://dev.folio.org/reference/api/)
 ## settings.json syntax
+There is a template file in the repo that reflects the current syntax.
+
 Every element in the settings.json file must have the following properties:
 ### name
 Name of the element containing the actual data. This is case sensitive. 
