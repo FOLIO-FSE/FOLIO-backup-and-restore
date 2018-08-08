@@ -10,24 +10,25 @@ class Backup:
         self.path = path
         print('initializing Backup')
 
+    def load_schema(self, schema_location):
+        req = requests.get(schema_location)
+        return json.loads(req.text)
+
     def backup(self, settings):
         for setting in settings:
             print("saving setting {}".format(setting['name']))
-            try:
-                self.save_one_setting(setting['name'],
-                                      setting['path'],
-                                      setting['queryString'])
-            except Exception as inst:
-                print(inst)
+            self.save_one_setting(setting)
 
-    def save_one_setting(self, setting_name, settings_path, query_string):
-        query = query_string or ''
-        req = requests.get(self.endpoint+settings_path+query,
+    def save_one_setting(self, config):
+
+        query = ('queryString' in config and config['queryString']) or ''
+        req = requests.get(self.endpoint+config['path']+query,
                            headers=self.headers)
-        res = json.loads(req.text)[setting_name]
-        setting = {'name': setting_name,
+        j = json.loads(req.text)
+        res = j if config['saveEntireResponse'] else j[config['name']]
+        setting = {'name': config['name'],
                    'data': res}
-        with open(self.path+setting_name+'.json', 'w+') as settings_file:
+        with open(self.path+config['name']+'.json', 'w+') as settings_file:
             settings_file.write(json.dumps(setting))
 
 
@@ -39,29 +40,27 @@ class Restore:
         print('initializing Restore')
 
     def restore(self, configuration):
-        for setting in configuration:
-            try:
-                self.restore_one_setting(setting['name'],
-                                         setting['path'],
-                                         setting['insertMethod'])
-            except Exception as inst:
-                print(inst)
+        for config in configuration:
+            self.restore_one_setting(config)
 
-    def restore_one_setting(self, setting_name, settings_path, method):
-        with open(self.path + setting_name + '.json') as settings_file:
+    def restore_one_setting(self, config):
+        with open(self.path + config['name'] + '.json') as settings_file:
             setting = json.load(settings_file)
+            print("Restoring {}".format(config['name']))
             for item in setting['data']:
-                if(method == "post"):
-                    req = requests.put(self.endpoint + settings_path,
+                if(config['insertMethod'] == "put"):
+                    req = requests.put(self.endpoint + config['path'],
                                        data=json.dumps(item),
                                        headers=self.headers)
                     print(req.status_code)
-
-                if(method == "post"):
-                    req = requests.post(self.endpoint + settings_path,
+                if(config['insertMethod'] == "post"):
+                    req = requests.post(self.endpoint + config['path'],
                                         data=json.dumps(item),
                                         headers=self.headers)
                     print(req.status_code)
+                    print(req.text)
+                    if(req.status_code == 422):
+                        print(json.dumps(req.json))
 
 
 parser = argparse.ArgumentParser()
@@ -70,11 +69,14 @@ parser.add_argument("from_path", help="path to file holdings the items")
 
 
 parser.add_argument("okapi_url",
-                    help="url of your FOLIO OKAPI endpoint. See settings->software version in FOLIO")
+                    help=("url of your FOLIO OKAPI endpoint."
+                          "See settings->software version in FOLIO"))
 parser.add_argument("tenant_id",
-                    help="id of the FOLIO tenant. See settings->software version in FOLIO")
+                    help=("id of the FOLIO tenant. "
+                          "See settings->software version in FOLIO"))
 parser.add_argument("okapi_token",
-                    help="the x-okapi-token. Easiest optained via F12 in the webbrowser")
+                    help=("the x-okapi-token. "
+                          "Easiest optained via F12 in the webbrowser"))
 
 args = parser.parse_args()
 okapi_headers = {'x-okapi-token': args.okapi_token,
