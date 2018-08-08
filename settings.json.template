@@ -2,32 +2,31 @@
 	{
 		"name": "loanPolicies",
 		"path": "/loan-policy-storage/loan-policies",
-		"insertMethod": "post"
+		"insertMethod": "post",
+		 "saveEntireResponse": false
 	},
 	{
 		"name": "loanRules",
-		"path": "circulation/loan-rules",
-		"insertMethod": "put"
+		"path": "/circulation/loan-rules",
+		"insertMethod": "put",
+		"saveEntireResponse": true
 	},
 	{
-		"name": "loanTypes",
+		"name": "loantypes",
 		"path": "/loan-types",
-		"insertMethod": "post"
-	},
-	{
-		"name": "materialTypes",
-		"path": "/material-types", 
-		"insertMethod": "post"
-	},
-	{
-		"name": "permissions",
-		"path": "/perms/permissions",
 		"insertMethod": "post",
-		"queryString": "?length=1000&query=(mutable==true)"
+		 "saveEntireResponse": false
+	},
+	{
+		"name": "mtypes",
+		"path": "/material-types", 
+		"insertMethod": "post",
+		 "saveEntireResponse": false
 	},
 	{
 		"name": "usergroups",
 		"path": "/groups",
-		"insertMethod": "post"
+		"insertMethod": "post",
+		 "saveEntireResponse": false
 	}
 ]
