@@ -28,5 +28,96 @@
 		"path": "/groups",
 		"insertMethod": "post",
 		 "saveEntireResponse": false
+	},
+	{
+		"name":"contributorTypes",
+		"path": "/contributor-types",
+		"insertMethod": "post",
+		"saveEntireResponse":false
+	},
+	{
+		"name":"instanceFormats",
+		"path": "/instance-formats",
+		"insertMethod": "post",
+		"saveEntireResponse":false
+	},
+	{
+		"name": "instanceTypes",
+		"path": "/instance-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "identifierTypes",
+		"path": "/identifier-types",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},	
+	{
+		"name": "locations",
+		"path": "/locations",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+
+	{
+		"name": "classificationTypes",
+		"path": "/classification-types",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loccamps",
+		"path": "/location-units/campuses",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "locinsts",
+		"path": "/location-units/institutions",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loclibs",
+		"path": "/location-units/libraries",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "platforms",
+		"path": "/platforms",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "servicepoints",
+		"path": "/service-points",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "shelflocations",
+		"path": "/shelf-locations",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "addressTypes",
+		"path": "/addresstypes",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "proxiesFor",
+		"path": "/proxiesfor",
+		"insertMethod":"post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "users",
+		"path": "/users?limit=1000&query=(patronGroup=\"5464cbd9-2c7d-4286-8e89-20c75980884b\")",
+		"insertMethod":"post",
+		"saveEntireResponse": false
 	}
 ]
