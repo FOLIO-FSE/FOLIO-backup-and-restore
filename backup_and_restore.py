@@ -1,4 +1,5 @@
 import argparse
+import pathlib
 import json
 import requests
 
@@ -20,16 +21,23 @@ class Backup:
             self.save_one_setting(setting)
 
     def save_one_setting(self, config):
-
         query = ('queryString' in config and config['queryString']) or ''
-        req = requests.get(self.endpoint+config['path']+query,
+        url = self.endpoint+config['path']+query
+        print("Fetching from: {}".format(url))
+        req = requests.get(url,
                            headers=self.headers)
         j = json.loads(req.text)
         res = j if config['saveEntireResponse'] else j[config['name']]
-        setting = {'name': config['name'],
-                   'data': res}
-        with open(self.path+config['name']+'.json', 'w+') as settings_file:
-            settings_file.write(json.dumps(setting))
+        if len(res) > 0:
+            setting = {'name': config['name'],
+                       'data': res}
+            filename = config['name']+".json"
+            path = pathlib.Path.cwd() / self.path / filename
+            print("Saving to: {}".format(path))
+            with pathlib.Path.open(path, 'w+') as settings_file:
+                settings_file.write(json.dumps(setting))
+        else:
+            print("No data found")
 
 
 class Restore:
@@ -44,7 +52,10 @@ class Restore:
             self.restore_one_setting(config)
 
     def restore_one_setting(self, config):
-        with open(self.path + config['name'] + '.json') as settings_file:
+        filename = config['name']+".json"
+        path = self.path / filename
+        print("Path: {}".format(path))
+        with pathlib.Path.open(path) as settings_file:
             setting = json.load(settings_file)
             print("Restoring {}".format(config['name']))
             for item in setting['data']:
@@ -81,6 +92,7 @@ parser.add_argument("okapi_token",
 args = parser.parse_args()
 okapi_headers = {'x-okapi-token': args.okapi_token,
                  'x-okapi-tenant': args.tenant_id,
+                 'x-okpapi-user-id': "a058f28f-80ac-4994-add6-e4d02fc238fe",
                  'content-type': 'application/json'}
 print('Performing {} of FOLIO tenant {} at {} ...'.format(args.function,
                                                           args.tenant_id,
