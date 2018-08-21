@@ -1,3 +1,5 @@
+NOTE! This is still work in progress. Please reach out for any questions.
+
 # FOLIO-backup-and-restore
 ## Current functionality:
 * Backs up and restores data from a FOLIO tenant after reset. What data that gets reset depends on configuration.
