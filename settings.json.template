@@ -119,5 +119,17 @@
 		"path": "/users?limit=1000&query=(patronGroup=\"5464cbd9-2c7d-4286-8e89-20c75980884b\")",
 		"insertMethod":"post",
 		"saveEntireResponse": false
+	},
+	{
+		"name": "tags",
+		"path": "/tags",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name":"feefines",
+		"path": "/feefines",
+		"insertMethod": "post",
+		"saveEntireResponse": false
 	}
 ]

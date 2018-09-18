@@ -53,7 +53,7 @@ class Restore:
 
     def restore_one_setting(self, config):
         filename = config['name']+".json"
-        path = self.path / filename
+        path = pathlib.Path(self.path) / filename
         print("Path: {}".format(path))
         with pathlib.Path.open(path) as settings_file:
             setting = json.load(settings_file)
