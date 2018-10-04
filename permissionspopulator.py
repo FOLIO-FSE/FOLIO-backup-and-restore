@@ -6,7 +6,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("okapi_url", help="url of your FOLIO OKAPI endpoint.")
 parser.add_argument("tenant_id", help="id of the FOLIO tenant")
 parser.add_argument("okapi_token", help="the x-okapi-token")
-parser.add_argument("perm_id", help="user id of user to get permissions")
+parser.add_argument("perm_id", help="Id of set to get permissions")
 args = parser.parse_args()
 okapiHeaders = {'x-okapi-token': args.okapi_token,
                 'x-okapi-tenant': args.tenant_id,
