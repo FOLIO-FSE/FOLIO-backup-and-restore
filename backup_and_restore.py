@@ -22,7 +22,7 @@ class Backup:
 
     def save_one_setting(self, config):
         query = ('queryString' in config and config['queryString']) or ''
-        url = self.endpoint+config['path']+query
+        url = self.endpoint+config['path']+query+'?limit=100'
         print("Fetching from: {}".format(url))
         req = requests.get(url,
                            headers=self.headers)
