@@ -24,20 +24,24 @@ class Backup:
         query = ('queryString' in config and config['queryString']) or ''
         url = self.endpoint+config['path']+query+'?limit=100'
         print("Fetching from: {}".format(url))
-        req = requests.get(url,
-                           headers=self.headers)
-        j = json.loads(req.text)
-        res = j if config['saveEntireResponse'] else j[config['name']]
-        if len(res) > 0:
-            setting = {'name': config['name'],
-                       'data': res}
-            filename = config['name']+".json"
-            path = pathlib.Path.cwd() / self.path / filename
-            print("Saving to: {}".format(path))
-            with pathlib.Path.open(path, 'w+') as settings_file:
-                settings_file.write(json.dumps(setting))
-        else:
-            print("No data found")
+        try:
+            req = requests.get(url,
+                            headers=self.headers)
+            j = json.loads(req.text)
+            res = j if config['saveEntireResponse'] else j[config['name']]
+            if len(res) > 0:
+                setting = {'name': config['name'],
+                        'data': res}
+                filename = config['name']+".json"
+                path = pathlib.Path.cwd() / self.path / filename
+                print("Saving to: {}".format(path))
+                with pathlib.Path.open(path, 'w+') as settings_file:
+                    settings_file.write(json.dumps(setting))
+            else:
+                print("No data found")
+        except Exception as ee:
+            print("ERROR=========================={}".format(config['name']))
+            print(ee)
 
 
 class Restore:
@@ -55,23 +59,27 @@ class Restore:
         filename = config['name']+".json"
         path = pathlib.Path(self.path) / filename
         print("Path: {}".format(path))
-        with pathlib.Path.open(path) as settings_file:
-            setting = json.load(settings_file)
-            print("Restoring {}".format(config['name']))
-            for item in setting['data']:
-                if(config['insertMethod'] == "put"):
-                    req = requests.put(self.endpoint + config['path'],
-                                       data=json.dumps(item),
-                                       headers=self.headers)
-                    print(req.status_code)
-                if(config['insertMethod'] == "post"):
-                    req = requests.post(self.endpoint + config['path'],
-                                        data=json.dumps(item),
-                                        headers=self.headers)
-                    print(req.status_code)
-                    print(req.text)
-                    if(req.status_code == 422):
-                        print(json.dumps(req.json))
+        try:
+            with pathlib.Path.open(path) as refdata_file:
+                refdata = json.load(refdata_file)
+                print("Restoring {}".format(config['name']))
+                for item in refdata['data']:
+                    if(config['insertMethod'] == "put"):
+                        req = requests.put(self.endpoint + config['path'],
+                                           data=json.dumps(item),
+                                           headers=self.headers)
+                        print(req.status_code)
+                    if(config['insertMethod'] == "post"):
+                        req = requests.post(self.endpoint + config['path'],
+                                            data=json.dumps(item),
+                                            headers=self.headers)
+                        print(req.status_code)
+                        if str(req.status_code).startswith('4'):
+                            print(req.text)
+                            print(json.dumps(req.json))
+        except Exception as ee:
+            print("ERROR=================================")
+            print(ee)
 
 
 parser = argparse.ArgumentParser()
@@ -88,6 +96,8 @@ parser.add_argument("tenant_id",
 parser.add_argument("okapi_token",
                     help=("the x-okapi-token. "
                           "Easiest optained via F12 in the webbrowser"))
+parser.add_argument("settings_file",
+                    help=("path to settings file"))
 
 args = parser.parse_args()
 okapi_headers = {'x-okapi-token': args.okapi_token,
@@ -97,7 +107,7 @@ okapi_headers = {'x-okapi-token': args.okapi_token,
 print('Performing {} of FOLIO tenant {} at {} ...'.format(args.function,
                                                           args.tenant_id,
                                                           args.okapi_url))
-with open('settings.json') as settings_file:
+with open(args.settings_file) as settings_file:
     configuration = json.load(settings_file)
 
 if (args.function == 'backup'):
