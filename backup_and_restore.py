@@ -5,10 +5,11 @@ import requests
 
 
 class Backup:
-    def __init__(self, endpoint, headers, path):
+    def __init__(self, endpoint, headers, path, set_name):
         self.endpoint = endpoint
         self.headers = headers
         self.path = path
+        self.set_name = set_name
         print('initializing Backup')
 
     def load_schema(self, schema_location):
@@ -16,9 +17,14 @@ class Backup:
         return json.loads(req.text)
 
     def backup(self, settings):
-        for setting in settings:
-            print("saving setting {}".format(setting['name']))
+        if self.set_name:
+            print("saving setting {}".format(self.set_name))
+            setting = next(s for s in settings if s['name'] == self.set_name)
             self.save_one_setting(setting)
+        else:
+            for setting in settings:
+                print("saving setting {}".format(setting['name']))
+                self.save_one_setting(setting)
 
     def save_one_setting(self, config):
         query = ('queryString' in config and config['queryString']) or ''
@@ -45,15 +51,21 @@ class Backup:
 
 
 class Restore:
-    def __init__(self, endpoint, headers, path):
+    def __init__(self, endpoint, headers, path, set_name):
         self.endpoint = endpoint
         self.headers = headers
         self.path = path
+        self.set_name = set_name
         print('initializing Restore')
 
-    def restore(self, configuration):
-        for config in configuration:
-            self.restore_one_setting(config)
+    def restore(self, settings):
+        if self.set_name:
+            print("restoring setting {}".format(self.set_name))
+            setting = next(s for s in settings if s['name'] == self.set_name)
+            self.restore_one_setting(setting)
+        else:
+            for setting in settings:
+                self.restore_one_setting(setting)
 
     def restore_one_setting(self, config):
         filename = config['name']+".json"
@@ -98,7 +110,7 @@ parser.add_argument("okapi_token",
                           "Easiest optained via F12 in the webbrowser"))
 parser.add_argument("settings_file",
                     help=("path to settings file"))
-
+parser.add_argument('-s', '--set_name', help='foo help')
 args = parser.parse_args()
 okapi_headers = {'x-okapi-token': args.okapi_token,
                  'x-okapi-tenant': args.tenant_id,
@@ -111,8 +123,10 @@ with open(args.settings_file) as settings_file:
     configuration = json.load(settings_file)
 
 if (args.function == 'backup'):
-    backup = Backup(args.okapi_url, okapi_headers, args.from_path)
+    backup = Backup(args.okapi_url, okapi_headers, args.from_path,
+                    args.set_name)
     backup.backup(configuration)
 if (args.function == 'restore'):
-    restore = Restore(args.okapi_url, okapi_headers, args.from_path)
+    restore = Restore(args.okapi_url, okapi_headers, args.from_path,
+                      args.set_name)
     restore.restore(configuration)
