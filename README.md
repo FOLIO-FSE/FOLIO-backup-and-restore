@@ -36,6 +36,9 @@ Given you have backed up your data according to the above guide. Run the followi
 ## settings.json syntax
 There is a template file in the repo that reflects the current syntax.
 
+### Backup or Restore specific settings
+add the argument `-s NAME_OF_SETTING` to the argument string and the script only runs the part from the settings.json that you specify.
+
 Every element in the settings.json file must have the following properties:
 ### name
 Name of the element containing the actual data. This is case sensitive. 
