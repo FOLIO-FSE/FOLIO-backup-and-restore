@@ -26,6 +26,15 @@ class Backup:
             raise ValueError("Request failed {}".format(req.status_code))
         return req
 
+    def parse_result(self, json, save_entire_respones, config):
+        if save_entire_respones:
+            return json
+        elif config['name'] in json:
+                return json[config['name']]
+        elif 'data' in json:
+            return json['data']
+        print("no parsing of response")
+
     def backup(self, settings):
         if self.set_name:
             print("saving setting {}".format(self.set_name))
@@ -42,19 +51,20 @@ class Backup:
         print("Fetching from: {}".format(url))
         try:
             save_entire_respones = config['saveEntireResponse']
-            print(save_entire_respones)
+            print(config)
             page_size = 100
             req = self.make_request(url, 0, page_size)
             j = json.loads(req.text)
-            total_recs = int(j['totalRecords'])
-            res = j if save_entire_respones else j[config['name']]
-            if total_recs > page_size and not save_entire_respones:
-                my_range = range(page_size, total_recs, page_size)
-                print(my_range)
-                for offset in my_range:
-                    resp = self.make_request(url, offset, page_size)
-                    j = json.loads(req.text)
-                    res.append(j[config['name']])
+            res = self.parse_result(j, save_entire_respones, config)
+            # total_recs = int(j['totalRecords'])
+            # if total_recs > page_size and not save_entire_respones:
+            #     my_range = range(page_size, total_recs, page_size)
+            #     print(my_range)
+            #     for offset in my_range:
+            #         resp = self.make_request(url, offset, page_size)
+            #         j = json.loads(req.text)
+            #         res.append(j[config['name']])
+            print(len(res))
             if len(res) > 0:
                 setting = {'name': config['name'],
                         'data': res}
@@ -155,7 +165,6 @@ okapi_token = get_token(args.okapi_url, args.tenant_id,
                         args.username, args.password)
 okapi_headers = {'x-okapi-token': okapi_token,
                  'x-okapi-tenant': args.tenant_id,
-                 'x-okpapi-user-id': "a058f28f-80ac-4994-add6-e4d02fc238fe",
                  'content-type': 'application/json'}
 print('Performing {} of FOLIO tenant {} at {} ...'.format(args.function,
                                                           args.tenant_id,
