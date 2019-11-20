@@ -30,7 +30,7 @@ class Backup:
         if save_entire_respones:
             return json
         elif config['name'] in json:
-                return json[config['name']]
+            return json[config['name']]
         elif 'data' in json:
             return json['data']
         print("no parsing of response")
@@ -67,7 +67,7 @@ class Backup:
             print(len(res))
             if len(res) > 0:
                 setting = {'name': config['name'],
-                        'data': res}
+                           'data': res}
                 filename = config['name']+".json"
                 path = pathlib.Path.cwd() / self.path / filename
                 print("Saving to: {}".format(path))
@@ -143,6 +143,7 @@ def get_token(url, tenant_id, username, password):
     except Exception as exception:
         print("Failed login request. No login token acquired.")
         raise exception
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("function", help="backup or restore...")
