@@ -27,19 +27,19 @@ Python 3.
 * Make a copy of the settings.json.template file and rename it settings.json. For syntax help, see section below.
 * Using the API reference (link below), populate the settings.json with the parameter settings you like to backup. 
 * run the following command:
-`python3 backup_and_restore.py backup [path_to_store_date] [okapi_url] [tenant_id] [x-okapi-token] [permission_set_id]`
+`python3 backup_and_restore.py backup [path_to_store_date] [okapi_url] [tenant_id] [username] [password] [path_to_settings_file]`
 
 ### Restore regular reference data
 Given you have backed up your data according to the above guide. Run the following command:
-`python3 backup_and_restore.py restore [path_to_store_date] [okapi_url] [tenant_id] [x-okapi-token] [permission_set_id]`
+`python3 backup_and_restore.py restore [path_to_store_date] [okapi_url] [tenant_id] [username] [password] [path_to_settings_file]`
 
 ### Backup ERM (Agreements and Licenses) reference data
 This script backsup both the Business objects and the reference data in ERM
-* run the following command:
+* run the following command:  
 `python3 erm_backup_and_restore.py backup [path_to_stored_date] [okapi_url] [tenant_id] [username] [password]`
 
 ### Restore  ERM (Agreements and Licenses) reference data
-Given you have backed up your data according to the above guide. Run the following command:
+Given you have backed up your data according to the above guide. Run the following command:  
 `python3 erm_backup_and_restore.py restore [path_to_stored_date] [okapi_url] [tenant_id] [username] [password]`
 
 ## Reference
