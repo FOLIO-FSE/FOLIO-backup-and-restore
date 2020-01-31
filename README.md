@@ -39,7 +39,9 @@ Given you have backed up your data according to the above guide. Run the followi
 
 ### Purge regular refence data
 To delete data that you have backup according the backup section. To work you need to have delete ALL records
-that use refenece data. For example to delete reference data of Inventory you must delete ALL instances, ALL holdings, ALL items. Quick delete scripts of those records are avaible from [IndexData Folio Import bash scripts] (https://github.com/indexdata/folio-import/tree/master/bash)
+that use refenece data. For example to delete reference data of Inventory you must delete ALL instances, ALL holdings, ALL items. Quick delete scripts of those records are avaible from [IndexData Folio Import bash scripts](https://github.com/indexdata/folio-import/tree/master/bash).
+* run the following commad:
+`python3 purge.py backup [path_to_store_date] [okapi_url] [tenant_id] [username] [password] [path_to_settings_file]`
 
 ### Backup ERM (Agreements and Licenses) reference data
 This script backsup both the Business objects and the reference data in ERM
