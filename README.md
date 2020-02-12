@@ -2,13 +2,17 @@ NOTE! This is still work in progress. Please reach out for any questions.
 
 # FOLIO-backup-and-restore
 ## Current functionality:
-* Backs up and restores reference data and more from a FOLIO tenant after reset. What data that gets reset depends on configuration.
+* Backs up and restores "regular" reference data and more from a FOLIO tenant after reset. What data that gets reset depends on configuration.
+* Backs up and restores ERM reference data
+* Backs up and restores ERM Data
 * Populates a permission set with every single permission there is. Usable for when you want to configure Admin rights to a FOLIO user without letting them be the Admin itself
 
 ## Caveats 
 Not all data and all API:s are suitable for this script. The aim if mainly for parameter/reference data settings, and not the module's data. Please report anything you find that is not compatible. 
 As of now, the following things are not restoreable:
-* Permissions
+* User Permissions
+* Permission sets
+Plus many more.
 
 In order to restore ERM data, you need to use a specific script: erm_backup_and_restore.py
 
