@@ -5,6 +5,75 @@ import requests
 from folioclient.FolioClient import FolioClient
 
 
+class Purge:
+    def __init__(self, folio_client, path, set_name):
+        self.folio_client = folio_client
+        self.path = path
+        self.set_name = set_name
+        print('initializing Purge')
+
+    def purge(self, settings):
+        if self.set_name:
+            print("purge setting {}".format(self.set_name))
+            setting = next(s for s in settings if s['name'] == self.set_name)
+            self.purge_one_setting(setting)
+        else:
+            raise Exception("No setting provided. Halting...")
+
+    def purge_one_setting(self, config):
+        save_entire_respones = config['saveEntireResponse']
+        query = ('queryString' in config and config['queryString']) or ''
+        url = self.folio_client.okapi_url + config['path'] + query
+        print("Fetching from: {}".format(url))
+        page_size = 100
+        req = self.make_request(url, 0, page_size)
+        j = json.loads(req.text)
+        total_recs = int(j['totalRecords'])
+        res = list(self.parse_result(j, save_entire_respones, config))
+        if total_recs > page_size and not save_entire_respones:
+            my_range = list(range(page_size, total_recs, page_size))
+            for offset in my_range:
+                resp = self.make_request(url, offset, page_size)
+                k = json.loads(resp.text)
+                ll = self.parse_result(
+                    k, save_entire_respones, config)
+                res.extend(ll)
+        print(f"records to purge {len(res)}")
+        for i in res:
+            try:
+                url = self.folio_client.okapi_url + \
+                    config['path'] + '/' + i['id']
+                print(url)
+                headers = self.folio_client.okapi_headers
+                req = requests.delete(url, headers=headers)
+                print(req.status_code)
+                if not str(req.status_code).startswith('2'):
+                    print(req.text)
+                    print(json.dumps(req.json))
+            except Exception as ee:
+                print("ERROR=================================")
+                print(ee)
+
+    def parse_result(self, json, save_entire_respones, config):
+        if save_entire_respones:
+            return json
+        elif config['name'] in json:
+            return json[config['name']]
+        elif 'data' in json:
+            return json['data']
+        print("no parsing of response")
+
+    def make_request(self, path, start, length):
+        query = '?limit={}&offset={}'.format(length, start)
+        # print(f"PATH: {path + query}")
+        req = requests.get(path + query.format(length, start),
+                           headers=self.folio_client.okapi_headers)
+        if req.status_code != 200:
+            print(req.text)
+            raise ValueError("Request failed {}".format(req.status_code))
+        return req
+
+
 class Backup:
     def __init__(self, folioclient, path, set_name):
         self.folio_client = folio_client
@@ -55,20 +124,20 @@ class Backup:
             page_size = 100
             req = self.make_request(url, 0, page_size)
             j = json.loads(req.text)
-            res = self.parse_result(j, save_entire_respones, config)
-            # total_recs = int(j['totalRecords'])
-            # if total_recs > page_size and not save_entire_respones:
-            #     my_range = range(page_size, total_recs, page_size)
-            #     print(my_range)
-            #     for offset in my_range:
-            #         resp = self.make_request(url, offset, page_size)
-            #         j = json.loads(req.text)
-            #         res.append(j[config['name']])
-            print(len(res))
+            total_recs = int(j['totalRecords'])
+            res = list(self.parse_result(j, save_entire_respones, config))
+            if total_recs > page_size and not save_entire_respones:
+                my_range = list(range(page_size, total_recs, page_size))
+                for offset in my_range:
+                    resp = self.make_request(url, offset, page_size)
+                    k = json.loads(resp.text)
+                    ll = self.parse_result(k, save_entire_respones, config)
+                    res.extend(ll)
+            print(f"found {len(res)} records. Saving...")
             if len(res) > 0:
                 setting = {'name': config['name'],
                            'data': res}
-                filename = config['name']+".json"
+                filename = config['name'] + ".json"
                 path = pathlib.Path.cwd() / self.path / filename
                 print("Saving to: {}".format(path))
                 with pathlib.Path.open(path, 'w+') as settings_file:
@@ -158,3 +227,7 @@ if (args.function == 'restore'):
     print("Restore")
     restore = Restore(folio_client, args.from_path, args.set_name)
     restore.restore(configuration)
+if (args.function == 'purge'):
+    print("purge")
+    purge = Purge(folio_client, args.from_path, args.set_name)
+    purge.purge(configuration)
