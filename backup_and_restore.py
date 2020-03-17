@@ -38,21 +38,22 @@ class Purge:
                 ll = self.parse_result(
                     k, save_entire_respones, config)
                 res.extend(ll)
-        print(f"records to purge {len(res)}")
+        print(f"records to purge {len(res)}", flush=True)
         for i in res:
             try:
+                ident = i['id'] if 'id' in i else i['recordId']
                 url = self.folio_client.okapi_url + \
-                    config['path'] + '/' + i['id']
-                print(url)
+                    config['path'] + '/' + ident
+                print(url, flush=True)
                 headers = self.folio_client.okapi_headers
                 req = requests.delete(url, headers=headers)
-                print(req.status_code)
+                print(req.status_code, flush=True)
                 if not str(req.status_code).startswith('2'):
-                    print(req.text)
-                    print(json.dumps(req.json))
+                    print(req.text, flush=True)
+                    print(json.dumps(req.json), flush=True)
             except Exception as ee:
-                print("ERROR=================================")
-                print(ee)
+                print("ERROR=================================", flush=True)
+                print(ee, flush=True)
 
     def parse_result(self, json, save_entire_respones, config):
         if save_entire_respones:
@@ -61,7 +62,7 @@ class Purge:
             return json[config['name']]
         elif 'data' in json:
             return json['data']
-        print("no parsing of response")
+        print("no parsing of response", flush=True)
 
     def make_request(self, path, start, length):
         query = '?limit={}&offset={}'.format(length, start)
@@ -69,7 +70,7 @@ class Purge:
         req = requests.get(path + query.format(length, start),
                            headers=self.folio_client.okapi_headers)
         if req.status_code != 200:
-            print(req.text)
+            print(req.text, flush=True)
             raise ValueError("Request failed {}".format(req.status_code))
         return req
 
@@ -79,7 +80,7 @@ class Backup:
         self.folio_client = folio_client
         self.path = path
         self.set_name = set_name
-        print('initializing Backup')
+        print('initializing Backup', flush=True)
 
     def load_schema(self, schema_location):
         req = requests.get(schema_location)
