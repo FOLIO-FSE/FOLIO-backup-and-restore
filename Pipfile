@@ -8,6 +8,12 @@ verify_ssl = true
 [packages]
 requests = "*"
 folioclient = "*"
+black = "*"
+sendgrid = "*"
+pylint = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true
