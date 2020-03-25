@@ -137,7 +137,7 @@ def make_request(
             )
         else:
             print(req.status_code, flush=True)
-            print(req.text)
+            # print(req.text)
             req.raise_for_status()
     except Exception as exception:
         print(exception, flush=True)
