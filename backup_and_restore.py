@@ -122,7 +122,7 @@ class Backup:
         try:
             save_entire_respones = config['saveEntireResponse']
             print(config)
-            page_size = 100
+            page_size = 1000
             req = self.make_request(url, 0, page_size)
             j = json.loads(req.text)
             total_recs = int(j['totalRecords'])
