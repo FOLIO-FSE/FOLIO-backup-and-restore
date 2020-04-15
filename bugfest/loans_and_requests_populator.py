@@ -16,14 +16,131 @@ from faker import Faker
 from datetime import datetime, timedelta
 
 
-def add_stats(stats, a):
-    if a not in stats:
-        stats[a] = 1
-    else:
-        stats[a] += 1
+class Worker:
+    """Class that is responsible for the acutal work"""
+
+    def __init__(self, folio_client, args):
+        """Init, setup"""
+        self.folio_client = folio_client
+        self.faker = Faker()
+        self.items = set()
+        self.loan_policies = {}
+        self.create_requests = args.create_requests
+        self.create_page_requests = args.create_page_requests
+        print(
+            f"Init. Interacting with tenant {args.tenant_id} as {args.username}  at {args.okapi_url}",
+            flush=True,
+        )
+        self.patron_groups = folio_client.get_all_ids("/groups")
+        print(f"Fetched {len(self.patron_groups)} patron groups")
+
+        self.item_loan_types = folio_client.get_all_ids("/loan-types")
+        print(f"Fetched {len(self.item_loan_types)} item loan types")
+
+        self.item_material_types = folio_client.get_all_ids("/material-types")
+        print(f"Fetched {len(self.item_material_types)} item material types")
+
+        self.service_points = folio_client.get_all_ids(
+            "/service-points", "?query=(pickupLocation==true)"
+        )
+        print(f"Fetched {len(self.service_points)} Service points")
+
+        self.locations = folio_client.get_all_ids("/locations")
+        print(f"Fetched {len(self.locations)} locations")
+
+        self.item_seeds = list(
+            itertools.product(
+                self.item_material_types, self.item_loan_types, self.locations
+            )
+        )
+        # Shuffle the list of combinations so that you can run multiple instances at the same time
+        random.shuffle(self.item_seeds)
+        print(
+            f"Created randomized list of {len(self.item_seeds)} possible combinations"
+        )
+        print("Init done.")
+
+    def work(self):
+        print("Starting....")
+        # Iterate over every combination
+        for seed in self.item_seeds:
+            material_type_id = seed[0]
+            loan_type_id = seed[1]
+            location_id = seed[2]
+            i_query = f'?query=(materialTypeId="{material_type_id}" and permanentLoanTypeId="{loan_type_id}" and effectiveLocationId="{location_id}" and status.name=="Available")'
+            # iterate over every patron group
+            for patron_group_id in self.patron_groups:
+
+                # get random Items from FOLIO based on the combination of parameters
+                items = self.folio_client.get_random_objects(
+                    "/item-storage/items", 10, query=i_query
+                )
+
+                # Get patrons from the current patron group
+                p_query = f'query=(patronGroup=="{patron_group_id}" and active==true)'
+                patrons = self.folio_client.get_random_objects("/users", 10, p_query)
+
+                # tie a patron to an item
+                item_patrons = zip(items, patrons)
+
+                for item_patron in item_patrons:
+
+                    # make sure we have barcodes
+                    if "barcode" in item_patron[1] and "barcode" in item_patron[0]:
+
+                        # pick a random service point
+                        service_point_id = random.choice(self.service_points)
+
+                        # 5 out of 6 items are checked out if argument -p was given
+                        if random.randint(0, 5) > 0 or not self.create_page_requests:
+                            # check out the item
+                            loan = self.folio_client.check_out_by_barcode(
+                                item_patron[0]["barcode"],
+                                item_patron[1]["barcode"],
+                                datetime.now(),
+                                service_point_id,
+                            )
+
+                            # "extend" the loan date backwards in time in a randomized matter
+                            if loan:
+                                extension_date = self.faker.date_time_between(
+                                    start_date="-1y", end_date="now"
+                                )
+                                self.folio_client.extend_open_loan(loan, extension_date)
+
+                        # 1 out of 6 items are paged if argument -p was given
+                        else:
+                            print("create page request", flush=True)
+                            self.folio_client.create_request(
+                                "Page",
+                                item_patron[1],
+                                item_patron[0],
+                                service_point_id,
+                            )
+
+                        # TODO: speed up this thingy. Fetching users is slow
+                        # Create requests for the loan or page. If -r was given
+                        if self.create_requests:
+                            for b in random.sample(range(30), random.randint(1, 4)):
+                                # pick random patron
+                                new_patron = next(
+                                    iter(
+                                        self.folio_client.get_random_objects(
+                                            "/users", 1, p_query
+                                        )
+                                    )
+                                )
+                                # request the item
+                                self.folio_client.create_request(
+                                    random.choice(["Hold", "Recall"]),
+                                    new_patron,
+                                    item_patron[0],
+                                    service_point_id,
+                                )
 
 
 def parse_args():
+    """Parse CLI Arguments"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "okapi_url",
@@ -38,191 +155,36 @@ def parse_args():
     )
     parser.add_argument("username", help=("the api user"))
     parser.add_argument("password", help=("the api users password"))
+    parser.add_argument(
+        "-create_requests",
+        "-r",
+        help=("Add requests to created loan or page"),
+        action="store_true",
+    )
+    parser.add_argument(
+        "-create_page_requests",
+        "-p",
+        help=("Create page requests as well as loans"),
+        action="store_true",
+    )
     args = parser.parse_args()
     return args
 
 
-def check_out_by_barcode(
-    folio_client, item_barcode, patron_barcode, loan_date: datetime, service_point_id
-):
-    try:
-        df = "%Y-%m-%dT%H:%M:%S.%f+0000"
-        data = {
-            "itemBarcode": item_barcode,
-            "userBarcode": patron_barcode,
-            "loanDate": loan_date.strftime(df),
-            "servicePointId": service_point_id,
-        }
-        path = "/circulation/check-out-by-barcode"
-        url = f"{folio_client.okapi_url}{path}"
-        print(f"POST {url}\t{json.dumps(data)}", flush=True)
-        req = requests.post(
-            url, headers=folio_client.okapi_headers, data=json.dumps(data)
-        )
-        print(req.status_code, flush=True)
-        if str(req.status_code) == "422":
-            print(
-                f"{json.loads(req.text)['errors'][0]['message']}\t{json.dumps(data)}",
-                flush=True,
-            )
-        elif str(req.status_code) == "201":
-            return json.loads(req.text)
-        else:
-            req.raise_for_status()
-    except Exception as exception:
-        traceback.print_exc()
-        print(exception, flush=True)
+def main():
+    """Main Method. Used for bootstrapping. """
+    # Parse CLI Arguments
+    args = parse_args()
+    # Connect to a FOLIO tenant
+    folio_client = FolioClient(
+        args.okapi_url, args.tenant_id, args.username, args.password
+    )
+    # Iniiate Worker
+    worker = Worker(folio_client, args)
+    # Do work
+    worker.work()
 
 
-def extend_open_loan(folio_client, loan):
-    try:
-        df = "%Y-%m-%dT%H:%M:%S.%f+0000"
-        loan_to_put = copy.deepcopy(loan)
-        del loan_to_put["metadata"]
-        loan_to_put["dueDate"] = fake.date_time_between(
-            start_date="-1y", end_date="now"
-        ).strftime(df)
-        url = f"{folio_client.okapi_url}/circulation/loans/{loan_to_put['id']}"
-        print(
-            f"PUT Extend loan to {loan_to_put['dueDate']}\t  {url}\t{json.dumps(loan_to_put)}",
-            flush=True,
-        )
-        req = requests.put(
-            url, headers=folio_client.okapi_headers, data=json.dumps(loan_to_put)
-        )
-        print(req.status_code)
-        if str(req.status_code) == "422":
-            print(
-                f"{json.loads(req.text)['errors'][0]['message']}\t{json.dumps(loan_to_put)}",
-                flush=True,
-            )
-        else:
-            req.raise_for_status()
-    except Exception as exception:
-        traceback.print_exc()
-        print(exception, flush=True)
-
-
-def make_request(
-    folio_client,
-    request_type,
-    patron,
-    item,
-    service_point_id,
-    request_date=datetime.now(),
-):
-    try:
-        df = "%Y-%m-%dT%H:%M:%S.%f+0000"
-        data = {
-            "requestType": request_type,
-            "fulfilmentPreference": "Hold Shelf",
-            "requester": {"barcode": patron["barcode"]},
-            "requesterId": patron["id"],
-            "item": {"barcode": item["barcode"]},
-            "itemId": item["id"],
-            "pickupServicePointId": service_point_id,
-            "requestDate": request_date.strftime(df),
-        }
-        path = "/circulation/requests"
-        url = f"{folio_client.okapi_url}{path}"
-        print(f"POST {url}\t{json.dumps(data)}", flush=True)
-        req = requests.post(
-            url, headers=folio_client.okapi_headers, data=json.dumps(data)
-        )
-        print(req.status_code, flush=True)
-        if str(req.status_code) == "422":
-            print(
-                f"{json.loads(req.text)['errors'][0]['message']}\t{json.dumps(data)}",
-                flush=True,
-            )
-        else:
-            print(req.status_code, flush=True)
-            # print(req.text)
-            req.raise_for_status()
-    except Exception as exception:
-        print(exception, flush=True)
-        traceback.print_exc()
-
-
-def get_random_objects(folio_client, path, count=1, query=""):
-    resp = folio_client.folio_get(path)
-    total = int(resp["totalRecords"])
-    name = next(f for f in [*resp] if f != "totalRecords")
-    rand = random.randint(0, total)
-    query = f"?limit={count}&offset={rand}"
-    print(f"{total} found, {rand} to pick")
-    return iter(folio_client.folio_get(path, name, query))
-
-
-def get_all_ids(folio_client, path, query=""):
-    resp = folio_client.folio_get(path)
-    name = next(f for f in [*resp] if f != "totalRecords")
-    gs = folio_client.folio_get_all(path, name, query)
-    ids = [f["id"] for f in gs]
-    print(len(ids), flush=True)
-    return ids
-
-
-fake = Faker()
-args = parse_args()
-loan_policies = {}
-print(f"{args.tenant_id} {args.username} {args.okapi_url}", flush=True)
-folio_client = FolioClient(args.okapi_url, args.tenant_id, args.username, args.password)
-patron_groups = get_all_ids(folio_client, "/groups")
-item_loan_types = get_all_ids(folio_client, "/loan-types")
-item_material_types = get_all_ids(folio_client, "/material-types")
-service_points = get_all_ids(
-    folio_client, "/service-points", "?query=(pickupLocation==true)"
-)
-locations = get_all_ids(folio_client, "/locations")
-item_seeds = list(itertools.product(item_material_types, item_loan_types, locations))
-random.shuffle(item_seeds)
-print(len(item_seeds))
-items = set()
-for seed in item_seeds:
-    material_type_id = seed[0]
-    loan_type_id = seed[1]
-    location_id = seed[2]
-    i_query = f'?query=(materialTypeId="{seed[0]}" and permanentLoanTypeId="{seed[1]}" and effectiveLocationId="{seed[2]}" and status.name=="Available")'
-    for patron_group_id in patron_groups:
-        items = get_random_objects(
-            folio_client, "/item-storage/items", 10, query=i_query
-        )
-        p_query = f'query=(patronGroup=="{patron_group_id}" and active==true)'
-        patrons = get_random_objects(folio_client, "/users", 10, p_query)
-        item_patrons = zip(items, patrons)
-        for item_patron in item_patrons:
-            if "barcode" in item_patron[1] and "barcode" in item_patron[0]:
-                service_point_id = random.choice(service_points)
-                if random.randint(0, 5) > 0:
-                    print("create loan", flush=True)
-                    # loan_date = fake.date_time_between(start_date="-1y", end_date="now")
-                    loan = check_out_by_barcode(
-                        folio_client,
-                        item_patron[0]["barcode"],
-                        item_patron[1]["barcode"],
-                        datetime.now(),
-                        service_point_id,
-                    )
-                    if loan:
-                        extend_open_loan(folio_client, loan)
-                else:
-                    print("create page request", flush=True)
-                    make_request(
-                        folio_client,
-                        "Page",
-                        item_patron[1],
-                        item_patron[0],
-                        service_point_id,
-                    )
-                for b in random.sample(range(30), random.randint(1, 4)):
-                    new_patron = next(
-                        get_random_objects(folio_client, "/users", 1, p_query)
-                    )
-                    make_request(
-                        folio_client,
-                        random.choice(["Hold", "Recall"]),
-                        new_patron,
-                        item_patron[0],
-                        service_point_id,
-                    )
+if __name__ == "__main__":
+    """This is the Starting point for the script"""
+    main()
