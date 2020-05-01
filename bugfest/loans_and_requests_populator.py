@@ -59,6 +59,7 @@ class Worker:
             f"Created randomized list of {len(self.item_seeds)} possible combinations"
         )
         print("Init done.")
+        LOST ITEMS!
 
     def work(self):
         print("Starting....")
@@ -175,12 +176,15 @@ def main():
     """Main Method. Used for bootstrapping. """
     # Parse CLI Arguments
     args = parse_args()
+    
     # Connect to a FOLIO tenant
     folio_client = FolioClient(
         args.okapi_url, args.tenant_id, args.username, args.password
     )
+    
     # Iniiate Worker
     worker = Worker(folio_client, args)
+    
     # Do work
     worker.work()
 
