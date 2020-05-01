@@ -1,0 +1,242 @@
+[
+	{
+		"name": "loanPolicies",
+		"path": "/loan-policy-storage/loan-policies",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "callNumberTypes",
+		"path": "/call-number-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "locinsts",
+		"path": "/location-units/institutions",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loccamps",
+		"path": "/location-units/campuses",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loclibs",
+		"path": "/location-units/libraries",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "locations",
+		"path": "/locations",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "classificationTypes",
+		"path": "/classification-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "servicepoints",
+		"path": "/service-points",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "addressTypes",
+		"path": "/addresstypes",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "holdingsTypes",
+		"path": "/holdings-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "staffSlips",
+		"path": "/staff-slips-storage/staff-slips",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "cancellationReasons",
+		"path": "/cancellation-reason-storage/cancellation-reasons",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "templates",
+		"path": "/templates",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "patronNoticePolicies",
+		"path": "/patron-notice-policy-storage/patron-notice-policies",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "requestPolicies",
+		"path": "/request-policy-storage/request-policies",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "fileExtensions",
+		"path": "/data-import/fileExtensions",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "alternativeTitleTypes",
+		"path": "/alternative-title-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "identifierTypes",
+		"path": "/identifier-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "contributorTypes",
+		"path": "/contributor-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "contributorNameTypes",
+		"path": "/contributor-name-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "instanceFormats",
+		"path": "/instance-formats",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "instanceStatuses",
+		"path": "/instance-statuses",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "instanceTypes",
+		"path": "/instance-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "holdingsTypes",
+		"path": "/holdings-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "illPolicies",
+		"path": "/ill-policies",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loantypes",
+		"path": "/loan-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "mtypes",
+		"path": "/material-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "loantypes",
+		"path": "/loan-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "statisticalCodes",
+		"path": "/statistical-codes",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "statisticalCodeTypes",
+		"path": "/statistical-code-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "electronicAccessRelationships",
+		"path": "/electronic-access-relationships",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "callNumberTypes",
+		"path": "/call-number-types",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "usergroups",
+		"path": "/groups",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "refunds",
+		"path": "/refunds",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "waiver",
+		"path": "/waives",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "categories",
+		"path": "/vendor-storage/categories",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "tags",
+		"path": "/tags",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "openingPeriods",
+		"path": "/calendar/periods",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "circulation_rules",
+		"path": "/circulation-rules-storage",
+		"insertMethod": "put",
+		"saveEntireResponse": true
+	},
+	{
+		"name": "organizations",
+		"path": "/organizations-storage/organizations",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	}
+]
