@@ -1,0 +1,9 @@
+[
+	{
+		"name": "items",
+		"path": "/item-storage/items",
+		"queryString": "?query=(effectiveLocationId==\"f4c5afee-261a-43d1-9708-cc123aaba50a\")",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	}
+]

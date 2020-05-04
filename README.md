@@ -2,7 +2,7 @@ NOTE! This is still work in progress. Please reach out for any questions.
 
 # FOLIO-backup-and-restore
 ## Current functionality:
-* Backs up and restores "regular" reference data and more from a FOLIO tenant after reset. What data that gets reset depends on configuration.
+* Backs up, Purges, and restores "regular" reference data and more from a FOLIO tenant after reset. What data that gets reset depends on configuration.
 * Backs up and restores ERM reference data
 * Backs up and restores ERM Data
 * Populates a permission set with every single permission there is. Usable for when you want to configure Admin rights to a FOLIO user without letting them be the Admin itself
@@ -32,6 +32,13 @@ Python 3.
 * Using the API reference (link below), populate the settings.json with the parameter settings you like to backup. 
 * run the following command:  
 `python3 backup_and_restore.py backup [path_to_store_date] [okapi_url] [tenant_id] [username] [password] [path_to_settings_file]`
+
+### Purge regular reference data
+* Note what data you want to purge
+* Make a copy of the settings.json.template file and rename it settings.json. For syntax help, see section below.
+* Using the API reference (link below), populate the settings.json with the parameter settings you like to purge. 
+* run the following command:  
+`python3 backup_and_restore.py purge / [okapi_url] [tenant_id] [username] [password] [path_to_settings_file] -s [name_of_setting_to_purge]`
 
 ### Restore regular reference data
 Given you have backed up your data according to the above guide. Run the following command:  

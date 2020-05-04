@@ -4,9 +4,18 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+rope = "*"
 
 [packages]
 requests = "*"
+folioclient = "*"
+black = "*"
+sendgrid = "*"
+pylint = "*"
+faker = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

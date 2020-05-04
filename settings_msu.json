@@ -1,11 +1,5 @@
 [
 	{
-		"name": "users",
-		"path": "/users",
-		"insertMethod": "post",
-		"saveEntireResponse": false
-	},
-	{
 		"name": "loanPolicies",
 		"path": "/loan-policy-storage/loan-policies",
 		"insertMethod": "post",

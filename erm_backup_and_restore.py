@@ -25,7 +25,7 @@ class Backup:
         self.save_agreements()
 
     def save_erm_refdata(self):
-        self.get_erm_data('/erm/refdataValues', 'erm_refdata.json')
+        self.get_erm_data('/erm/refdata', 'erm_refdata.json')
 
     def save_licences_refdata(self):
         self.get_erm_data('/licenses/refdata', 'licenses_refdata.json')
@@ -73,7 +73,7 @@ class Restore:
         self.restore_agreements()
 
     def restore_erm_refdata(self):
-        self.restore_one("/erm/refdataValues", 'erm_refdata.json')
+        self.restore_one("/erm/refdata", 'erm_refdata.json')
 
     def restore_licences_refdata(self):
         self.restore_one("/licenses/refdata", 'licenses_refdata.json')
