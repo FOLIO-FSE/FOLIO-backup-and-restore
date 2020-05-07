@@ -59,7 +59,6 @@ class Worker:
             f"Created randomized list of {len(self.item_seeds)} possible combinations"
         )
         print("Init done.")
-        LOST ITEMS!
 
     def work(self):
         print("Starting....")
@@ -103,11 +102,13 @@ class Worker:
                             )
 
                             # "extend" the loan date backwards in time in a randomized matter
-                            if loan:
+                            if loan[0]:
                                 extension_date = self.faker.date_time_between(
                                     start_date="-1y", end_date="now"
                                 )
-                                self.folio_client.extend_open_loan(loan, extension_date)
+                                self.folio_client.extend_open_loan(
+                                    loan[1], extension_date
+                                )
 
                         # 1 out of 6 items are paged if argument -p was given
                         else:
@@ -176,15 +177,15 @@ def main():
     """Main Method. Used for bootstrapping. """
     # Parse CLI Arguments
     args = parse_args()
-    
+
     # Connect to a FOLIO tenant
     folio_client = FolioClient(
         args.okapi_url, args.tenant_id, args.username, args.password
     )
-    
+
     # Iniiate Worker
     worker = Worker(folio_client, args)
-    
+
     # Do work
     worker.work()
 
