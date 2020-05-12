@@ -26,6 +26,8 @@ class Worker:
         self.folio_client = folio_client
         self.loans = list(loans)
         print("Init done.")
+        self.patron_item_combos = set()
+        self.duplicate_loans = 0
 
     def work(self):
         print("Starting....")
@@ -40,18 +42,21 @@ class Worker:
                     datetime.now(),
                     "83d474aa-ee99-4924-8704-a03e3c56e0d9",
                 )
-
                 # "extend" the loan date backwards in time in a randomized matter
-                if loan_created:
+                if loan_created[0]:
+                    loan_to_extend = loan_created[1]
                     due_date = dateutil.parser.isoparse(loan["due_date"])
                     out_date = dateutil.parser.isoparse(loan["out_date"])
-                    print(
-                        f" loan created: {loan_created} {out_date.isoformat()} - {due_date.isoformat()}"
-                    )
-                    self.folio_client.extend_open_loan(loan_created, due_date)
+                    self.folio_client.extend_open_loan(loan_to_extend, due_date)
+                # this file might be a product, count duplicates.
+                if (loan["patron_id"], loan["item_id"]) in self.patron_item_combos:
+                    self.duplicate_loans += 1
+                else:
+                    self.patron_item_combos.add((loan["patron_id"], loan["item_id"]))
             except Exception as ee:
                 print(f"Errror in row {i} {ee}")
                 raise ee
+        print(self.duplicate_loans)
 
 
 def parse_args():
