@@ -41,17 +41,18 @@ class Worker:
                 req = requests.post(
                     url, headers=self.folio_client.okapi_headers, data=row
                 )
-                print(
-                    f"{self.num_rows}\tHTTP {req.status_code}\tPOST {url}\t{row}",
-                    end="",
-                )
-                if req.status_code != 201:
+
+                if req.status_code == 201:
+                    print(f"{self.num_rows}\tHTTP {req.status_code}\tPOST {url}")
+                elif req.status_code == 422:
                     self.failed_posts += 0
-                    if req.status_code == 422:
-                        print(
-                            f"{json.loads(req.text)['errors'][0]['message']}",
-                            flush=True,
-                        )
+                    print(
+                        f"{self.num_rows}\tHTTP {req.status_code}\t{json.loads(req.text)['errors'][0]['message']}\tPOST {url}\t{row}"
+                    )
+                else:
+                    print(
+                        f"{self.num_rows}\tHTTP {req.status_code}\t{req.text}\tPOST {url}\t{row}"
+                    )
             except Exception as ee:
                 print(f"Errror in row {self.num_rows} {ee}")
                 if self.num_rows < 10:
@@ -92,8 +93,6 @@ def main():
     folio_client = FolioClient(
         args.okapi_url, args.tenant_id, args.username, args.password
     )
-    # CSV parse the file
-    csv.register_dialect("tsv", delimiter="\t")
     with open(args.datafile) as data_file:
 
         # Initiate Worker
