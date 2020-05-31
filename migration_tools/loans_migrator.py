@@ -42,7 +42,7 @@ class Worker:
         print("Starting....")
         # Iterate over every loan
         i = 0
-        for loan in self.loans[500:]:
+        for loan in self.loans:
             if loan["item_id"] not in self.successful_items:
                 try:
                     t0_fuction = time.time()
