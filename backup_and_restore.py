@@ -188,45 +188,53 @@ class Restore:
                     print(ee)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("function", help="backup or restore...")
-parser.add_argument("from_path", help="path to file holdings the items")
-parser.add_argument(
-    "okapi_url",
-    help=(
-        "url of your FOLIO OKAPI endpoint." "See settings->software version in FOLIO"
-    ),
-)
-parser.add_argument(
-    "tenant_id",
-    help=("id of the FOLIO tenant. " "See settings->software version in FOLIO"),
-)
-parser.add_argument("username", help=("the api user"))
-parser.add_argument("password", help=("the api users password"))
-parser.add_argument("settings_file", help=("path to settings file"))
-parser.add_argument("-s", "--set_name", help="foo help")
-args = parser.parse_args()
-
-
-print(
-    "Performing {} of FOLIO tenant {} at {} ...".format(
-        args.function, args.tenant_id, args.okapi_url
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("function", help="backup or restore...")
+    parser.add_argument("from_path", help="path to file holdings the items")
+    parser.add_argument(
+        "okapi_url",
+        help=(
+            "url of your FOLIO OKAPI endpoint."
+            "See settings->software version in FOLIO"
+        ),
     )
-)
-folio_client = FolioClient(args.okapi_url, args.tenant_id, args.username, args.password)
+    parser.add_argument(
+        "tenant_id",
+        help=("id of the FOLIO tenant. " "See settings->software version in FOLIO"),
+    )
+    parser.add_argument("username", help=("the api user"))
+    parser.add_argument("password", help=("the api users password"))
+    parser.add_argument("settings_file", help=("path to settings file"))
+    parser.add_argument("-s", "--set_name", help="foo help")
+    args = parser.parse_args()
 
-with open(args.settings_file) as settings_file:
-    configuration = json.load(settings_file)
+    print(
+        "Performing {} of FOLIO tenant {} at {} ...".format(
+            args.function, args.tenant_id, args.okapi_url
+        )
+    )
+    folio_client = FolioClient(
+        args.okapi_url, args.tenant_id, args.username, args.password
+    )
 
-if args.function == "backup":
-    print("Backup")
-    backup = Backup(folio_client, args.from_path, args.set_name)
-    backup.backup(configuration)
-if args.function == "restore":
-    print("Restore")
-    restore = Restore(folio_client, args.from_path, args.set_name)
-    restore.restore(configuration)
-if args.function == "purge":
-    print("purge")
-    purge = Purge(folio_client, args.from_path, args.set_name)
-    purge.purge(configuration)
+    with open(args.settings_file) as settings_file:
+        configuration = json.load(settings_file)
+
+    if args.function == "backup":
+        print("Backup")
+        backup = Backup(folio_client, args.from_path, args.set_name)
+        backup.backup(configuration)
+    if args.function == "restore":
+        print("Restore")
+        restore = Restore(folio_client, args.from_path, args.set_name)
+        restore.restore(configuration)
+    if args.function == "purge":
+        print("purge")
+        purge = Purge(folio_client, args.from_path, args.set_name)
+        purge.purge(configuration)
+
+
+if __name__ == "__main__":
+    """This is the Starting point for the script"""
+    main()

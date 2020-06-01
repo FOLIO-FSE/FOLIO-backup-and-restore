@@ -10,6 +10,7 @@ import copy
 import requests
 import traceback
 import xml
+import time
 from datetime import datetime as dt
 import xml.etree.ElementTree as ET
 import collections
@@ -27,6 +28,7 @@ class Worker:
         self.folio_client = folio_client
         self.objects_file = objects_file
         self.endpoint = endpoint
+        self.t0 = time.time()
         print("Init done.")
 
     def work(self):
@@ -35,6 +37,7 @@ class Worker:
             next(self.objects_file)
             self.num_rows += 1
         for row in self.objects_file:
+            t0_fuction = time.time()
             self.num_rows += 1
             try:
                 url = f"{self.folio_client.okapi_url}{self.endpoint}"
@@ -47,7 +50,9 @@ class Worker:
                 elif req.status_code == 422:
                     self.failed_posts += 0
                     print(
-                        f"{self.num_rows}\tHTTP {req.status_code}\t{json.loads(req.text)['errors'][0]['message']}\tPOST {url}\t{row}"
+                        f"{self.num_rows}\tHTTP {req.status_code}\t"
+                        f"{json.loads(req.text)['errors'][0]['message']}\tPOST {url}\t{row}"
+                        f" {timings(self.t0, t0_fuction, self.num_rows)}"
                     )
                 else:
                     print(
@@ -59,6 +64,13 @@ class Worker:
                     raise ee
 
         print(f"Done! {self.num_rows} rows in file. Failed: {self.failed_posts}")
+
+
+def timings(t0, t0func, num_objects):
+    avg = num_objects / (time.time() - t0)
+    elapsed = time.time() - t0
+    elapsed_func = num_objects / (time.time() - t0func)
+    return f"Objects processed: {num_objects}\tTotal elapsed: {elapsed}\tAverage per object: {avg:.2f}\tElapsed this time: {elapsed_func:.2f}"
 
 
 def parse_args():

@@ -43,7 +43,7 @@ print(f"{args.tenant_id} {args.username} {args.okapi_url}")
 folio_client = FolioClient(args.okapi_url, args.tenant_id, args.username, args.password)
 patron_emails = set()
 path1 = "/circulation/loans"
-query = '?query=(status.name="Open" AND dueDate < "2020-05-14*")'
+query = '?query=(status.name="Open" AND dueDate < "2020-08-14*")'
 print(f"path: {path1} query: {query}")
 i = 0
 stats = {}
@@ -53,7 +53,7 @@ print(len(loans))
 for loan in loans:
     loan_to_put = copy.deepcopy(loan)
     del loan_to_put["metadata"]
-    loan_to_put["dueDate"] = "2020-05-14T21:59:59.000+0000"
+    loan_to_put["dueDate"] = "2020-08-14T21:59:59.000+0000"
     print(loan_to_put["dueDate"])
     try:
         put_loan(folio_client, loan_to_put)

@@ -96,7 +96,7 @@ class Worker:
         # wrap up
         for k, v in self.failed.items():
             self.failed_and_not_dupe[k] = [v]
-        # print(json.dumps(self.failed_and_not_dupe, sort_keys=True, indent=4))
+        print(json.dumps(self.failed_and_not_dupe, sort_keys=True, indent=4))
         print("## Loan migration counters")
         print("Title | Number")
         print("--- | ---:")

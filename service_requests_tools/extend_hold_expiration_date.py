@@ -70,17 +70,17 @@ print(f"{args.tenant_id} {args.username} {args.okapi_url}")
 folio_client = FolioClient(args.okapi_url, args.tenant_id, args.username, args.password)
 patron_emails_sucess = set()
 path1 = "/circulation/requests"
-query = '?query=(status="Awaiting pickup" and holdShelfExpirationDate < "2020-05-14*")'
+query = '?query=(status="Awaiting pickup" and holdShelfExpirationDate < "2020-08-14*")'
 print(f"path: {path1} query: {query}")
 i = 0
 stats = {}
 failed = set()
 requests_l = folio_client.folio_get_all(path1, "requests", query)
 print(f"found {len(requests_l)} requests to extend")
-for request in requests_l[1:]:
+for request in requests_l:
     request_to_put = copy.deepcopy(request)
     del request_to_put["metadata"]
-    request_to_put["holdShelfExpirationDate"] = "2020-05-14T22:59:59.000+0000"
+    request_to_put["holdShelfExpirationDate"] = "2020-08-14T22:59:59.000+0000"
     print(request_to_put["holdShelfExpirationDate"])
     try:
         put_request(folio_client, request_to_put)

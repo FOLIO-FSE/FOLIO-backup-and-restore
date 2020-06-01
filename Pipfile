@@ -8,11 +8,11 @@ rope = "*"
 
 [packages]
 requests = "*"
-folioclient = "*"
 black = "*"
 sendgrid = "*"
 pylint = "*"
-faker = "*"
+Faker = "*"
+folioclient = "*"
 
 [requires]
 python_version = "3.7"
