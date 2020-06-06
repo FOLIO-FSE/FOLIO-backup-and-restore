@@ -2,6 +2,7 @@ import argparse
 import pathlib
 import json
 import requests
+import datetime
 from folioclient.FolioClient import FolioClient
 
 
@@ -23,17 +24,22 @@ class Purge:
     def purge_one_setting(self, config):
         save_entire_respones = config["saveEntireResponse"]
         query = ("queryString" in config and config["queryString"]) or ""
-        url = self.folio_client.okapi_url + config["path"] + query
+        query = (
+            query.replace("NNNOW", datetime.datetime.now().isoformat())
+            if query
+            else query
+        )
+        url = self.folio_client.okapi_url + config["path"]
         print("Fetching from: {}".format(url))
         page_size = 100
-        req = self.make_request(url, 0, page_size)
+        req = self.make_request(url, 0, page_size, query)
         j = json.loads(req.text)
         total_recs = int(j["totalRecords"])
         res = list(self.parse_result(j, save_entire_respones, config))
         if total_recs > page_size and not save_entire_respones:
             my_range = list(range(page_size, total_recs, page_size))
             for offset in my_range:
-                resp = self.make_request(url, offset, page_size)
+                resp = self.make_request(url, offset, page_size, query)
                 k = json.loads(resp.text)
                 ll = self.parse_result(k, save_entire_respones, config)
                 res.extend(ll)

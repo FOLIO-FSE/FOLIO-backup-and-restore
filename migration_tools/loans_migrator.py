@@ -67,7 +67,9 @@ class Worker:
                         loan_to_extend = loan_created[1]
                         due_date = dateutil.parser.isoparse(loan["due_date"])
                         out_date = dateutil.parser.isoparse(loan["out_date"])
-                        self.folio_client.extend_open_loan(loan_to_extend, due_date)
+                        self.folio_client.extend_open_loan(
+                            loan_to_extend, due_date, out_date
+                        )
                         print(f"{timings(self.t0, t0_fuction, i)}")
 
                         self.successful_items.add(loan["item_id"])
@@ -105,10 +107,10 @@ class Worker:
         print(f"Successfully checked out items | {len(self.successful_items)}")
         print(f"Failed items/loans | {len(self.failed_and_not_dupe)}")
         print(f"Total Rows in file  | {i}")
-        """for a in self.migration_report:
+        for a in self.migration_report:
             print(f"# {a}")
             for b in self.migration_report[a]:
-                print(b)"""
+                print(b)
 
     def add_to_migration_report(self, header, messageString):
         if header not in self.migration_report:
