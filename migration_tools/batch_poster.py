@@ -36,12 +36,23 @@ class Worker:
         batch = []
         for row in self.objects_file:
             json_rec = json.loads(row.split("\t")[-1])
+            keys_to_delete = []
+            for k, v in json_rec.items():
+                if not v:
+                    keys_to_delete.append(k)
+                elif not any(v):
+                    keys_to_delete.append(k)
+            for key in keys_to_delete:
+                del json_rec[key]
             self.processed_rows += 1
             try:
-                batch.append(json_rec)
-                if len(batch) == int(self.batch_size):
-                    self.post_batch(batch)
-                    batch = []
+                if "title" not in json_rec or "instanceTypeId" not in json_rec:
+                    print(f"Title not in record {json_rec}")
+                else:
+                    batch.append(json_rec)
+                    if len(batch) == int(self.batch_size):
+                        self.post_batch(batch)
+                        batch = []
             except Exception as exception:
                 print(exception, flush=True)
                 traceback.print_exc()
