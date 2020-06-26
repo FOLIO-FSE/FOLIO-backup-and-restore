@@ -46,15 +46,13 @@ class Worker:
                 del json_rec[key]
             self.processed_rows += 1
             try:
-                if "title" not in json_rec or "instanceTypeId" not in json_rec:
-                    print(f"Title not in record {json_rec}")
-                else:
-                    batch.append(json_rec)
-                    if len(batch) == int(self.batch_size):
-                        self.post_batch(batch)
-                        batch = []
+                batch.append(json_rec)
+                if len(batch) == int(self.batch_size):
+                    self.post_batch(batch)
+                    batch = []
             except Exception as exception:
-                print(exception, flush=True)
+                print(f"{exception} row failed", flush=True)
+                batch = []
                 traceback.print_exc()
         self.post_batch(batch)
         print(json.dumps(self.failed_objects), flush=True)
@@ -72,19 +70,21 @@ class Worker:
             resp = json.loads(response.text)
             for error in resp["errors"]:
                 self.failed_ids.append(error["parameters"][0]["value"])
-            if not repost:
+            print(f"1 {len(batch)}")
+            self.handle_failed_batch(batch)
+            """if not repost:
                 self.handle_failed_batch(batch)
             else:
-                raise Exception(f"Reposting despite handling. {self.failed_ids}")
+                raise Exception(f"Reposting despite handling. {self.failed_ids}")"""
         elif response.status_code in [500, 413]:
             # Error handling is sparse. Need to identify failing records
             print(f"{response.status_code}\t{response.text}")
             if not len(batch) == 1:
                 # split the batch in 2
-                chunks = chunks(batch, 2)
-                for chunk in chunks:
+                my_chunks = chunks(batch, 2)
+                for chunk in my_chunks:
                     print(
-                        f"split batch in {len(chunks)} "
+                        f"split batch in {len(my_chunks)} "
                         f"chunks with {len(chunk)} objects. "
                         "posting chunk..."
                     )
@@ -98,9 +98,16 @@ class Worker:
             raise Exception(f"ERROR! HTTP {response.status_code}\t{response.text}")
 
     def handle_failed_batch(self, batch):
-        new_batch = []
-        for id in self.failed_ids:
-            new_batch.extend([it for it in batch if id not in json.dumps(it)])
+        new_batch = [f for f in batch]  # if f["instanceId"] not in self.failed_ids]
+        # print(f"2 {len(batch)}")
+        """
+        for it in batch:
+            batch_string = json.dumps(it)
+            for id in self.failed_ids:
+                if id in batch_string:
+                    print(f"id found {id}, removing.")
+                elif it not in new_batch:
+                    new_batch.append(it)"""
         print(
             f"reposting new batch {len(self.failed_ids)} {len(batch)} {len(new_batch)}",
             flush=True,
