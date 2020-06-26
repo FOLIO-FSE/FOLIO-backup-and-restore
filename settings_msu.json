@@ -1,7 +1,20 @@
 [
 	{
+		"name": "scheduledNotices",
+		"path": "/scheduled-notice-storage/scheduled-notices",
+		"insertMethod": "post",
+		"queryString": "?query=(nextRunTime<\"NNNOW\")",
+		"saveEntireResponse": false
+	},
+	{
 		"name": "loanPolicies",
 		"path": "/loan-policy-storage/loan-policies",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "patronActionSessions",
+		"path": "/patron-action-session-storage/patron-action-sessions",
 		"insertMethod": "post",
 		"saveEntireResponse": false
 	},
@@ -224,6 +237,12 @@
 	{
 		"name": "openingPeriods",
 		"path": "/calendar/periods",
+		"insertMethod": "post",
+		"saveEntireResponse": false
+	},
+	{
+		"name": "issuanceModes",
+		"path": "/modes-of-issuance",
 		"insertMethod": "post",
 		"saveEntireResponse": false
 	},

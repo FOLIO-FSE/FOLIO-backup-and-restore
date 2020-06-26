@@ -37,12 +37,6 @@ class Worker:
         for row in self.objects_file:
             json_rec = json.loads(row.split("\t")[-1])
             keys_to_delete = []
-            for i in json_rec.get("identifiers", []):
-                if " " in i["identifierTypeId"]:
-                    isplit = str.split(i["identifierTypeId"])
-                    i["identifierTypeId"] = isplit[0]
-                    # print(isplit)
-                    # print(json_rec["identifiers"])
             for k, v in json_rec.items():
                 if not v:
                     keys_to_delete.append(k)
