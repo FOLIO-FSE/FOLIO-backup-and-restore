@@ -66,14 +66,6 @@ class Worker:
                                 json_rec["mfhdId"]
                             ]
                             del json_rec["mfhdId"]
-                        keys_to_delete = []
-                        for k, v in json_rec.items():
-                            if not v:
-                                keys_to_delete.append(k)
-                            elif not any(v):
-                                keys_to_delete.append(k)
-                        for key in keys_to_delete:
-                            del json_rec[key]
                         self.processed_rows += 1
                         batch.append(json_rec)
                         if len(batch) == int(self.batch_size):
