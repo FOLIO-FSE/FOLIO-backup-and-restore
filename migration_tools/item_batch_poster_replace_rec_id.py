@@ -15,6 +15,8 @@ import xml.etree.ElementTree as ET
 import collections
 from folioclient.FolioClient import FolioClient
 import os
+from os.path import isfile, join
+from posix import listdir
 
 
 class Worker:
@@ -44,34 +46,42 @@ class Worker:
     def work(self):
         print("Starting....")
         batch = []
-        for row in self.objects_file:
-            try:
-                json_rec = json.loads(row.split("\t")[-1])
-                if json_rec["holdingsRecordId"] not in self.holdings_id_map:
-                    raise ValueError(
-                        f'Holdings id {json_rec["holdingsRecordId"]} not in map'
-                    )
-                else:
-                    json_rec["holdingsRecordId"] = self.holdings_id_map[
-                        json_rec["holdingsRecordId"]
-                    ]
-                keys_to_delete = []
-                for k, v in json_rec.items():
-                    if not v:
-                        keys_to_delete.append(k)
-                    elif not any(v):
-                        keys_to_delete.append(k)
-                for key in keys_to_delete:
-                    del json_rec[key]
-                self.processed_rows += 1
-                batch.append(json_rec)
-                if len(batch) == int(self.batch_size):
-                    self.post_batch(batch)
-                    batch = []
-            except Exception as exception:
-                print(f"{exception} row failed", flush=True)
-                batch = []
-                traceback.print_exc()
+        files = [
+            join(self.objects_file, f)
+            for f in listdir(self.objects_file)
+            if isfile(join(self.objects_file, f))
+        ]
+        for file in files:
+            print(file)
+            with open(file) as objects_file:
+                for row in objects_file:
+                    try:
+                        json_rec = json.loads(row.split("\t")[-1])
+                        if json_rec["holdingsRecordId"] not in self.holdings_id_map:
+                            raise ValueError(
+                                f'Holdings id {json_rec["holdingsRecordId"]} not in map'
+                            )
+                        else:
+                            json_rec["holdingsRecordId"] = self.holdings_id_map[
+                                json_rec["holdingsRecordId"]
+                            ]
+                        keys_to_delete = []
+                        for k, v in json_rec.items():
+                            if not v:
+                                keys_to_delete.append(k)
+                            elif not any(v):
+                                keys_to_delete.append(k)
+                        for key in keys_to_delete:
+                            del json_rec[key]
+                        self.processed_rows += 1
+                        batch.append(json_rec)
+                        if len(batch) == int(self.batch_size):
+                            self.post_batch(batch)
+                            batch = []
+                    except Exception as exception:
+                        print(f"{exception} row failed", flush=True)
+                        batch = []
+                        traceback.print_exc()
         self.post_batch(batch)
         print(json.dumps(self.failed_objects), flush=True)
         print(json.dumps(self.failed_ids, indent=4), flush=True)
