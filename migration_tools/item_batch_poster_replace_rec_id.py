@@ -181,14 +181,12 @@ def main():
     folio_client = FolioClient(
         args.okapi_url, args.tenant_id, args.username, args.password
     )
-    with open(args.datafile) as data_file, open(
-        args.id_map_path, "r"
-    ) as holdings_id_map_file:
+    with open(args.id_map_path, "r") as holdings_id_map_file:
         holdings_id_map = json.load(holdings_id_map_file)
         # Initiate Worker
         worker = Worker(
             folio_client,
-            data_file,
+            args.datafile,
             args.batch_size,
             args.api_path,
             args.object_name,
