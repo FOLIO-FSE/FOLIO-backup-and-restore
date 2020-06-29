@@ -57,14 +57,15 @@ class Worker:
                 for row in objects_file:
                     try:
                         json_rec = json.loads(row.split("\t")[-1])
-                        if json_rec["holdingsRecordId"] not in self.holdings_id_map:
+                        if json_rec["mfhdId"] not in self.holdings_id_map:
                             raise ValueError(
-                                f'Holdings id {json_rec["holdingsRecordId"]} not in map'
+                                f'Holdings id {json_rec["mfhdId"]} not in map'
                             )
                         else:
                             json_rec["holdingsRecordId"] = self.holdings_id_map[
-                                json_rec["holdingsRecordId"]
+                                json_rec["mfhdId"]
                             ]
+                            del json_rec["mfhdId"]
                         keys_to_delete = []
                         for k, v in json_rec.items():
                             if not v:
