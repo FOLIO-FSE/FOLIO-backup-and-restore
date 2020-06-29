@@ -66,6 +66,9 @@ class Worker:
                                 json_rec["mfhdId"]
                             ]
                             del json_rec["mfhdId"]
+                        if "copyNumbers" in json_rec:
+                            json_rec["copyNumber"] = json_rec["copyNumbers"]
+                            del json_rec["copyNumbers"]
                         self.processed_rows += 1
                         batch.append(json_rec)
                         if len(batch) == int(self.batch_size):
