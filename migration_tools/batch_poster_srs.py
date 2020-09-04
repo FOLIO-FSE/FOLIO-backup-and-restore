@@ -152,8 +152,7 @@ def main():
 
         # Initiate Worker
         worker = Worker(
-            folio_client, data_file, args.batch_size, args.api_path, args.object_name
-        )
+            folio_client, data_file, args.batch_size)
 
         # Do work
         worker.work()
