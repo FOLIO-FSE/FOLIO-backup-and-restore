@@ -129,8 +129,6 @@ def parse_args():
     parser.add_argument("username", help=("the api user"))
     parser.add_argument("password", help=("the api users password"))
     parser.add_argument("batch_size", help=("batch size"))
-    parser.add_argument("api_path", help=("batch size"))
-    parser.add_argument("object_name", help=("batch size"))
     args = parser.parse_args()
     return args
 
