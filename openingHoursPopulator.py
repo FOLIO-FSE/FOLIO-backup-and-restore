@@ -2,18 +2,20 @@ import pathlib
 import requests
 import json
 import argparse
+from folioclient.FolioClient import FolioClient
 
 parser = argparse.ArgumentParser()
-parser.add_argument("operation", help="result file path")
-parser.add_argument("path", help="result file path")
+parser.add_argument("operation", help="backup or restore")
+parser.add_argument("path", help="result file path (backup); take data from this file (restore)")
 parser.add_argument("okapi_url", help="url of your FOLIO OKAPI endpoint.")
 parser.add_argument("tenant_id", help="id of the FOLIO tenant")
-parser.add_argument("okapi_token", help="the x-okapi-token")
+parser.add_argument("username", help=("the api user"))
+parser.add_argument("password", help=("the api users password"))
 
 args = parser.parse_args()
-okapiHeaders = {'x-okapi-token': args.okapi_token,
-                'x-okapi-tenant': args.tenant_id,
-                'content-type': 'application/json'}
+folio_client = FolioClient(args.okapi_url, args.tenant_id, args.username, args.password)
+okapiHeaders = folio_client.okapi_headers
+
 if str(args.operation) == 'backup':
     periods_query = "?withOpeningDays=true&showPast=true&showExceptional"
     periods_path = "/calendar/periods/{}/period{}"
